@@ -2,3 +2,5 @@ streamlit
 scipy
 pandas
 scikit-learn
+nltk
+openpyxl

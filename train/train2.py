@@ -7,11 +7,24 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # Load dataset
-df_dbd = pd.read_csv('./dataset/df_numeric.csv', index_col=0)
+df_dbd = pd.read_csv('./dataset/new_df_final.csv', index_col=0)
 
-print(df_dbd.head())
+# df_dbd["Class"] = np.nan
+# for x in range(100):
+#   if x > 79 :
+#     df_dbd.loc[x, 'Class'] = int(0)
+#   else:
+#     df_dbd.loc[x, 'Class'] = int(1)
 
+# # print(df_dbd['Class'].isnull().sum())
 # df_dbd['Class'] = df_dbd['Class'].astype(int)
+# df_dbd = df_dbd.drop(['Diagnosa Masuk', 'Diagnosis Keluar'], axis=1)
+# df_dbd.to_csv('./dataset/new_df_final.csv', index=False)
+
+print(df_dbd)
+print(df_dbd.dtypes)
+
+df_dbd['Class'] = df_dbd['Class'].astype(int)
 X = df_dbd.drop('Class', axis=1).values
 y = df_dbd[["Class"]].values
 
