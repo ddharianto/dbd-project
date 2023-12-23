@@ -7,7 +7,9 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # Load dataset
-df_dbd = pd.read_csv('./dataset/new_df_final.csv', index_col=0)
+df_dbd = pd.read_csv('./dataset/new_df_final.csv')
+
+# print(df_dbd)
 
 # df_dbd["Class"] = np.nan
 # for x in range(100):
@@ -21,12 +23,28 @@ df_dbd = pd.read_csv('./dataset/new_df_final.csv', index_col=0)
 # df_dbd = df_dbd.drop(['Diagnosa Masuk', 'Diagnosis Keluar'], axis=1)
 # df_dbd.to_csv('./dataset/new_df_final.csv', index=False)
 
-print(df_dbd)
-print(df_dbd.dtypes)
+# print(df_dbd)
 
-df_dbd['Class'] = df_dbd['Class'].astype(int)
-X = df_dbd.drop('Class', axis=1).values
+df_dbd['Keluhan Utama'] = df_dbd['Keluhan Utama'].apply(eval)
+df_dbd['Riwayat Penyakit Sekarang'] = df_dbd['Riwayat Penyakit Sekarang'].apply(eval)
+
+print(df_dbd['Keluhan Utama'].apply(type).unique())
+
+df_dbd['Keluhan Utama'] = np.array(df_dbd['Keluhan Utama'])
+df_dbd['Riwayat Penyakit Sekarang'] = np.array(df_dbd['Riwayat Penyakit Sekarang'])
+
+
+print(df_dbd.dtypes)
+print(df_dbd[['Keluhan Utama', 'Riwayat Penyakit Sekarang']])
+# df_dbd.to_csv('./dataset/new_df_final.csv', index=False)
+
+# print(df_dbd)
+
+# X = df_dbd.drop(['Class'], axis=1).values
 y = df_dbd[["Class"]].values
+X = df_dbd.drop(['Class', 'Keluhan Utama', 'Riwayat Penyakit Sekarang'], axis=1).values
+
+print(df_dbd)
 
 # Binarize labels
 lb = LabelBinarizer()
@@ -43,11 +61,15 @@ class ELM:
         self.output_size = output_size
         self.input_weights = np.random.rand(self.input_size, self.hidden_size)
         self.bias = np.random.rand(self.hidden_size)
+        
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
 
     def train(self, X, y):
+        X = np.array(X)
+        self.input_weights = np.array(self.input_weights) 
+        self.bias = np.array(self.bias) 
         # Random hidden layer weights
         H = self.sigmoid(np.dot(X, self.input_weights) + self.bias)
         H_pseudo_inv = np.linalg.pinv(H)
