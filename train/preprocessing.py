@@ -98,8 +98,8 @@ Y2 = Y2.toarray()
 df_final['Keluhan Utama'] = X2.tolist()
 df_final['Riwayat Penyakit Sekarang'] = Y2.tolist()
 
-df_final['Keluhan Utama'] = df_final['Keluhan Utama'].astype(str)
-df_final['Riwayat Penyakit Sekarang'] = df_final['Riwayat Penyakit Sekarang'].astype(str)
+# df_final['Keluhan Utama'] = df_final['Keluhan Utama'].astype(str)
+# df_final['Riwayat Penyakit Sekarang'] = df_final['Riwayat Penyakit Sekarang'].astype(str)
 
 # def convert_to_array(x):
 #     if isinstance(x, list) or isinstance(x, np.ndarray):
@@ -110,10 +110,10 @@ df_final['Riwayat Penyakit Sekarang'] = df_final['Riwayat Penyakit Sekarang'].as
 # df_final['Riwayat Penyakit Sekarang'] = df_final['Riwayat Penyakit Sekarang'].apply(convert_to_array)
 
 print(df_final['Keluhan Utama'].loc[[0]].values)
+print(df_final['Keluhan Utama'].values)
+print(X2)
 print(df_final.dtypes)
-print(df_final)
-print(df_final['Riwayat Penyakit Sekarang'].apply(type).unique())
-print(df_final['Keluhan Utama'].apply(type).unique())
+print(df_final[['Keluhan Utama', 'Riwayat Penyakit Sekarang']])
 
 
 df_final.to_csv('./dataset/df_final.csv', index=0) # menyimpan dataset ke csv
