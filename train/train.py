@@ -1,75 +1,101 @@
-# from elmmodel import elm
 import numpy as np
 import pandas as pd
-# from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import pickle
 
 # Load dataset
-df_dbd = pd.read_csv('./dataset/df_numeric.csv', index_col=0)
+df_dbd = pd.read_csv('./dataset/df_final.csv')
 
-print(df_dbd.head())
+# print(df_dbd.info())
 
-# df_dbd['Class'] = df_dbd['Class'].astype(int)
-X = df_dbd.drop('Class', axis=1).values
-y = df_dbd[["Class"]].values
+y = df_dbd[['Diagnosis DBD']].values
+X = df_dbd.drop(['Diagnosis DBD'], axis=1).values
 
 # Binarize labels
 lb = LabelBinarizer()
 y = lb.fit_transform(y)
 
+# print("X shape:", X.shape)
+# print("X sample:", X[0])  # Print a sample row of X
+
 # Split dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Define Extreme Learning Machine class
-class ELM:
-    def __init__(self, input_size, hidden_size, output_size):
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.output_size = output_size
-        self.input_weights = np.random.rand(self.input_size, self.hidden_size)
-        self.bias = np.random.rand(self.hidden_size)
+# Model Parameters
+input_size = X.shape[1]  # Number of features
+hidden_size = 100  # Number of neurons in the hidden layer
+output_size = y_train.shape[1]  # For binary classification (0 and 1)
 
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+# Generate random weights and biases for input layer to hidden layer
+input_weights = np.random.normal(size=(input_size, hidden_size))
+hidden_bias = np.random.normal(size=(hidden_size,))
 
-    def train(self, X, y):
-        # Random hidden layer weights
-        H = self.sigmoid(np.dot(X, self.input_weights) + self.bias)
-        H_pseudo_inv = np.linalg.pinv(H)
-        # Output layer weights
-        self.output_weights = np.dot(H_pseudo_inv, y)
+# print("input_weights shape:", input_weights.shape)
+# print("input_weights sample:", input_weights[0])  # Print a sample row of input_weights
 
-    def predict(self, X):
-        H = self.sigmoid(np.dot(X, self.input_weights) + self.bias)
-        predicted = np.dot(H, self.output_weights)
-        return predicted
+# Calculate hidden layer output using ReLU activation function
+hidden_layer_output = np.dot(X_train, input_weights) + hidden_bias
+hidden_layer_output = np.maximum(hidden_layer_output, 0)
 
-# Initialize ELM
-input_size = X_train.shape[1]# Berapa banyak fitur yang digunakan
-hidden_size = 50  # Change the number of hidden nodes as needed
-output_size = y_train.shape[1]
+# Calculate output weights
+output_weights = np.dot(np.linalg.pinv(hidden_layer_output), y_train)
 
-elm = ELM(input_size, hidden_size, output_size)
+# Predict using the trained ELM
+test_hidden_layer_output = np.dot(X_test, input_weights) + hidden_bias
+test_hidden_layer_output = np.maximum(test_hidden_layer_output, 0)
+predictions = np.dot(test_hidden_layer_output, output_weights)
 
-# Train ELM
-elm.train(X_train, y_train)
+# Convert predictions to classes using a threshold (e.g., 0.5)
+threshold = 0.5
+predicted_classes = (predictions >= threshold).astype(int)
+true_classes = y_test
 
-# Make predictions on test set
-predictions = elm.predict(X_test)
-
-# Convert predictions to classes
-predicted_classes = np.argmax(predictions, axis=1)
-true_classes = np.argmax(y_test, axis=1)
-
-# Calculate accuracy
+# Calculate evaluation metrics
 accuracy = accuracy_score(true_classes, predicted_classes)
-precision = precision_score(true_classes, predicted_classes, average='macro')
-recall = recall_score(true_classes, predicted_classes, average='macro')
-f1 = f1_score(true_classes, predicted_classes, average='macro')
+precision = precision_score(true_classes, predicted_classes, average='binary')
+recall = recall_score(true_classes, predicted_classes, average='binary')
+f1 = f1_score(true_classes, predicted_classes, average='binary')
 
 print("Accuracy:", accuracy)
 print("Precision:", precision)
 print("Recall:", recall)
 print("F1 Score:", f1)
+
+# Create a DataFrame with predictions, true labels, and input features for display
+predictions_df = pd.DataFrame({
+    'Predicted Probability': predictions.flatten(),
+    'Predicted Class': predicted_classes.flatten(),
+    'True Class': true_classes.flatten()
+})
+result_df = pd.concat([predictions_df], axis=1)
+
+# Display the DataFrame with prediction results
+print(result_df)
+
+model_data = {
+    'input_weights': input_weights,
+    'hidden_bias': hidden_bias,
+    'output_weights': output_weights,
+    'threshold': threshold
+}
+
+with open('trained_model.pkl', 'wb') as file:
+    pickle.dump(model_data, file)
+
+# # Load the saved model
+# with open('trained_model.pkl', 'rb') as file:
+#     model_data = pickle.load(file)
+
+# # Load your new data for prediction
+# # Replace this with your new data
+# new_data = np.array([[...], [...]])  # Your new data goes here
+
+# # Make predictions using the loaded model
+# hidden_layer_output = np.dot(new_data, input_weights) + hidden_bias
+# hidden_layer_output = np.maximum(hidden_layer_output, 0)
+# predictions = np.dot(hidden_layer_output, output_weights)
+# predicted_classes = (predictions >= threshold).astype(int)
+
+# print("Predicted classes:", predicted_classes)

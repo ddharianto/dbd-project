@@ -43,7 +43,7 @@ def main():
         # feature
             all_feature = [f_nadi, f_suhu, f_hemoglobin, f_lekosit, f_hematrokit, f_trombosit]
             hasil_prediksi = "Positif DBD"
-            st.success(f"Hasil Prediksi Anda adalah: {hasil_prediksi}")
+            st.success(f"Hasil Prediksi Anda adalah: {f_mual}")
         else:
             st.write(f"Hasil Prediksi Anda adalah Negatif DBD")
 

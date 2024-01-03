@@ -5,11 +5,12 @@ from sklearn import preprocessing
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+import pickle
 
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk_stopwords = set(stopwords.words('indonesian'))
-words_excluded = {'hari', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan'}
+words_excluded = {'hari'}
 stop = nltk_stopwords - words_excluded
 label_encoder = preprocessing.LabelEncoder()
 bow = CountVectorizer()
@@ -44,10 +45,12 @@ df_textual['Imunisasi'] = label_encoder.fit_transform(df_textual['Imunisasi']) #
 print(df_textual['Imunisasi'].unique())
 
 print(df_textual[df_textual.columns[1:11]])
+print(df_textual['KT Mual'].unique())
 
 df_textual[df_textual.columns[1:11]] = df_textual[df_textual.columns[1:11]].apply(label_encoder.fit_transform) # Mengubah value menjadi angka
 print(df_textual[df_textual.columns[1:11]])
 print(df_textual[df_textual.columns[1:11]].nunique())
+print(df_textual['KT Mual'].unique())
 
 print(df_textual['Keluhan Utama'])
 
@@ -58,9 +61,11 @@ df_textual['Keluhan Utama'] = df_textual['Keluhan Utama'].apply(lambda x: ' '.jo
 print(df_textual['Keluhan Utama'])
 
 # Term Frequency–Inverse Document Frequency (TF-IDF)
-keluhan_utama = tf_idf.fit_transform(df_textual['Keluhan Utama'])
-keluhan_utama = keluhan_utama.toarray()
-df_textual['Keluhan Utama'] = keluhan_utama.tolist()
+le_KU = tf_idf.fit_transform(df_textual['Keluhan Utama'])
+print(tf_idf.get_feature_names_out())
+le_KU = le_KU.toarray()
+print(le_KU)
+df_textual['Keluhan Utama'] = le_KU.tolist()
 
 print(df_textual['Keluhan Utama'])
 
@@ -77,7 +82,7 @@ for index, row in df_textual.iterrows():
     for i, value in enumerate(tfidf_values[:max_features]):  # Iterate through vector
         df_textual.at[index, f'KU{i+1}'] = value  # Assign value to respective column
 
-# Drop the original 'Keluhan Utama' column as it's no longer needed
+# # Drop the original 'Keluhan Utama' column as it's no longer needed
 df_textual.drop(columns=['Keluhan Utama'], inplace=True)
 
 print(df_textual['Diagnosa Masuk'].unique())
@@ -90,7 +95,6 @@ print(df_textual['Diagnosa Masuk'].unique())
 
 print(df_textual)
 print(df_textual.dtypes)
-
 
 df_numeric = pd.read_excel("./dataset/Dataset DBD.xlsx", sheet_name=2)
 print(df_numeric.dtypes)
@@ -117,39 +121,19 @@ print(df_final)
 print(df_final.dtypes)
 
 # # Bag of Words (BoW)
-
 # X1 = bow.fit_transform(df_final['Keluhan Utama'])
 # X1 = X1.toarray()
-
-# Y1 = bow.fit_transform(df_final['Riwayat Penyakit Sekarang'])
-# Y1 = Y1.toarray()
 
 # # Term Frequency–Inverse Document Frequency (TF-IDF)
 # X2 = tf_idf.fit_transform(df_final['Keluhan Utama'])
 # X2 = X2.toarray()
 
-# Y2 = tf_idf.fit_transform(df_final['Riwayat Penyakit Sekarang'])
-# Y2 = Y2.toarray()
+# Save TF-IDF encoder
+encoder = {
+    'tf_idf': tf_idf
+}
 
-# df_final['Keluhan Utama'] = X2.tolist()
-# df_final['Riwayat Penyakit Sekarang'] = Y2.tolist()
-
-# # df_final['Keluhan Utama'] = df_final['Keluhan Utama'].astype(str)
-# # df_final['Riwayat Penyakit Sekarang'] = df_final['Riwayat Penyakit Sekarang'].astype(str)
-
-# # def convert_to_array(x):
-# #     if isinstance(x, list) or isinstance(x, np.ndarray):
-# #         return np.array(x)
-# #     return x
-
-# # df_final['Keluhan Utama'] = df_final['Keluhan Utama'].apply(convert_to_array)
-# # df_final['Riwayat Penyakit Sekarang'] = df_final['Riwayat Penyakit Sekarang'].apply(convert_to_array)
-
-# print(df_final['Keluhan Utama'].loc[[0]].values)
-# print(df_final['Keluhan Utama'].values)
-# print(X2)
-# print(df_final.dtypes)
-# print(df_final[['Keluhan Utama', 'Riwayat Penyakit Sekarang']])
-
+with open('encoder.pkl', 'wb') as file:
+    pickle.dump(encoder, file)
 
 df_final.to_csv('./dataset/df_final.csv', index=0) # menyimpan dataset ke csv
