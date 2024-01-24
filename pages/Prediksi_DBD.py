@@ -93,14 +93,14 @@ def main():
         # # Drop the original 'Keluhan Utama' column as it's no longer needed
         df.drop(columns=['Keluhan Utama'], inplace=True)
 
-        df_scaled = scaler.transform(df)
+        df_scaled = scaler.transform(df.values)
 
-        # print(df)
+        # print(df_scaled)
         # print(df.dtypes)
         # print(df.info())
 
         # Make predictions using the loaded model
-        hidden_layer_output = np.dot(df_scaled.values, input_weights) + hidden_bias
+        hidden_layer_output = np.dot(df_scaled, input_weights) + hidden_bias
         hidden_layer_output = np.maximum(hidden_layer_output, 0)
         predictions = np.dot(hidden_layer_output, output_weights)
         predicted_classes = (predictions >= threshold).astype(int)
