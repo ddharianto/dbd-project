@@ -60,31 +60,6 @@ df_textual['Keluhan Utama'] = df_textual['Keluhan Utama'].apply(lambda x: ' '.jo
 # df_textual['Riwayat Penyakit Sekarang'] = df_textual['Riwayat Penyakit Sekarang'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stop)])) # menghilangkan stop words
 print(df_textual['Keluhan Utama'])
 
-# Term Frequency–Inverse Document Frequency (TF-IDF)
-le_KU = tf_idf.fit_transform(df_textual['Keluhan Utama'])
-print(tf_idf.get_feature_names_out())
-le_KU = le_KU.toarray()
-print(le_KU)
-df_textual['Keluhan Utama'] = le_KU.tolist()
-
-print(df_textual['Keluhan Utama'])
-
-list_lengths = len(df_textual['Keluhan Utama'].loc[0])
-
-# Extract TF-IDF features into new columns
-max_features = list_lengths  # Replace with the maximum length of your TF-IDF vectors
-for i in range(max_features):
-    df_textual[f'KU{i+1}'] = 0.0  # Create new columns
-
-# Populate the new columns with TF-IDFvalues
-for index, row in df_textual.iterrows():
-    tfidf_values = row['Keluhan Utama']  # Extract TF-IDF vector
-    for i, value in enumerate(tfidf_values[:max_features]):  # Iterate through vector
-        df_textual.at[index, f'KU{i+1}'] = value  # Assign value to respective column
-
-# # Drop the original 'Keluhan Utama' column as it's no longer needed
-df_textual.drop(columns=['Keluhan Utama'], inplace=True)
-
 print(df_textual['Diagnosa Masuk'].unique())
 
 df_textual['Diagnosa Masuk'].fillna(df_textual['Diagnosa Masuk'].mode()[0], inplace=True) # Mengisi value NaN dengan nilai modus
@@ -116,6 +91,31 @@ print(df_numeric.isnull().sum())
 print(df_numeric)
 
 df_final = pd.concat([df_textual, df_numeric], axis=1, join="inner") # menggabungkan kedua dataframes
+
+# Term Frequency–Inverse Document Frequency (TF-IDF)
+le_KU = tf_idf.fit_transform(df_final['Keluhan Utama'])
+print(tf_idf.get_feature_names_out())
+le_KU = le_KU.toarray()
+print(le_KU)
+df_final['Keluhan Utama'] = le_KU.tolist()
+
+print(df_final['Keluhan Utama'])
+
+list_lengths = len(df_final['Keluhan Utama'].loc[0])
+
+# Extract TF-IDF features into new columns
+max_features = list_lengths  # Replace with the maximum length of your TF-IDF vectors
+for i in range(max_features):
+    df_final[f'KU{i+1}'] = 0.0  # Create new columns
+
+# Populate the new columns with TF-IDFvalues
+for index, row in df_final.iterrows():
+    tfidf_values = row['Keluhan Utama']  # Extract TF-IDF vector
+    for i, value in enumerate(tfidf_values[:max_features]):  # Iterate through vector
+        df_final.at[index, f'KU{i+1}'] = value  # Assign value to respective column
+
+# # Drop the original 'Keluhan Utama' column as it's no longer needed
+df_final.drop(columns=['Keluhan Utama'], inplace=True)
 
 print(df_final)
 print(df_final.dtypes)

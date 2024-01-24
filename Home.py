@@ -1,2 +1,7 @@
 import streamlit as st
-st.header("Hello World")
+
+def main(): 
+    st.title("Prediksi Diagnosa Penyakit DBD Menggunakan Machine Learning")
+
+if __name__=='__main__': 
+    main()

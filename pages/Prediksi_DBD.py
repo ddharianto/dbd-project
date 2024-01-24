@@ -34,7 +34,7 @@ def main():
     </div>
     """
     st.markdown(html_temp, unsafe_allow_html = True)
-    
+    st.header('Keluhan Awal')
     f_keluhan_utama = st.text_input("Keluhan Utama", help="Gunakan angka apabila memasukkan waktu. Contoh '1 hari, 5 hari, 1 minggu, dst'")
     st.text("Keluhan Tambahan")
     f_mual = st.checkbox("Mual")
@@ -47,25 +47,27 @@ def main():
     f_mencret = st.checkbox("Mencret")
     f_imunisasi = st.selectbox("Imunisasi", ["Lengkap","Tidak Lengkap","Tidak Diimunisasi"])
     f_kesadaran = st.selectbox("Kesadaran", ['Compos Mentis', 'Delirium', 'Apatis'])
-    st.text("Pemeriksaan Laboratorium")
+    f_diagnosa = st.selectbox("Diagnosa DBD", ['Positif', 'Negatif'])
+    st.header("Pemeriksaan Laboratorium")
     f_pl_gds = st.checkbox("GDS")
     f_pl_widal = st.checkbox("WIDAL")
-    f_nadi = st.slider("Nadi", min_value=20, max_value=200, value=70)
-    f_suhu = st.slider("Suhu Tubuh", min_value=20.0, max_value=45.0, value=37.5)
-    f_hemoglobin = st.slider("Hemoglobin", min_value=0.0, max_value=20.0, value=15.0)
-    f_leukosit = st.slider("Leukosit", min_value=1000, max_value=20000, value=9000)
-    f_hematrokit = st.slider("Hematokrit", min_value=10.0, max_value=80.0, value=40.0)
-    f_trombosit = st.slider("Trombosit", min_value=10000, max_value=450000, value=150000)
-    f_diagnosa = st.selectbox("Diagnosa DBD", ['Positif', 'Negatif'])
+    f_nadi = st.number_input("Nadi", min_value=20, max_value=200, value=70)
+    f_suhu = st.number_input("Suhu Tubuh", min_value=20.0, max_value=45.0, value=37.5)
+    f_hemoglobin = st.number_input("Hemoglobin", min_value=0.0, max_value=20.0, value=15.0)
+    f_leukosit = st.number_input("Leukosit", min_value=1000, max_value=20000, value=9000)
+    f_hematrokit = st.number_input("Hematokrit", min_value=10.0, max_value=80.0, value=40.0)
+    f_trombosit = st.number_input("Trombosit", min_value=10000, max_value=450000, value=150000)
+    
     
     if st.button("Predict"): 
         features = [f_keluhan_utama, f_mual, f_muntah, f_perutsakit, f_pusing, f_batuk, f_pilek, 
-                    f_tidak_nafsu_makan, f_mencret, f_pl_gds, f_pl_widal, f_imunisasi, f_kesadaran, 
-                    f_nadi, f_suhu, f_hemoglobin, f_leukosit, f_hematrokit, f_trombosit, f_diagnosa]
+                    f_tidak_nafsu_makan, f_mencret, f_pl_gds, f_pl_widal, f_imunisasi, f_kesadaran, f_diagnosa, 
+                    f_nadi, f_suhu, f_hemoglobin, f_leukosit, f_hematrokit, f_trombosit]
         
         df=pd.DataFrame([list(features)], columns=['Keluhan Utama','KT Mual','KT Muntah','KT Perut Sakit','KT Pusing',
                                                    'KT Batuk','KT Pilek','KT Tidak Nafsu Makan','KT Mencret','PL GDS','PL WIDAL',
-                                                   'Imunisasi','Kesadaran','Nadi','Suhu','Hemoglobin','Leukosit','Hematokrit','Trombosit', 'Diagnosa Masuk'])
+                                                   'Imunisasi','Kesadaran','Diagnosa Masuk','Nadi','Suhu','Hemoglobin','Leukosit','Hematokrit',
+                                                   'Trombosit'])
         df = df.replace({True: 0, False: 1})
         df = df.replace({'Compos Mentis': 1, 'Delirium': 2, 'Apatis': 0})
         df = df.replace({'Lengkap': 0, 'Tidak Lengkap': 1, 'Tidak Diimunisasi': 2})
@@ -95,7 +97,7 @@ def main():
 
         df_scaled = scaler.transform(df.values)
 
-        # print(df_scaled)
+        print(df)
         # print(df.dtypes)
         # print(df.info())
 

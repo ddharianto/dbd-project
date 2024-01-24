@@ -20,12 +20,13 @@ y = lb.fit_transform(y)
 # print("X shape:", X.shape)
 # print("X sample:", X[0])  # Print a sample row of X
 
+# Split dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
 # Min-Max scaling for input features
 scaler = MinMaxScaler()
-X_scaled = scaler.fit_transform(X)
-
-# Split dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
 # Model Parameters
 input_size = X.shape[1]  # Number of features
@@ -40,14 +41,14 @@ hidden_bias = np.random.normal(size=(hidden_size,))
 # print("input_weights sample:", input_weights[0])  # Print a sample row of input_weights
 
 # Calculate hidden layer output using ReLU activation function
-hidden_layer_output = np.dot(X_train, input_weights) + hidden_bias
+hidden_layer_output = np.dot(X_train_scaled, input_weights) + hidden_bias
 hidden_layer_output = np.maximum(hidden_layer_output, 0)
 
 # Calculate output weights
 output_weights = np.dot(np.linalg.pinv(hidden_layer_output), y_train)
 
 # Predict using the trained ELM
-test_hidden_layer_output = np.dot(X_test, input_weights) + hidden_bias
+test_hidden_layer_output = np.dot(X_test_scaled, input_weights) + hidden_bias
 test_hidden_layer_output = np.maximum(test_hidden_layer_output, 0)
 predictions = np.dot(test_hidden_layer_output, output_weights)
 
