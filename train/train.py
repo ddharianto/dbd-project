@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import LabelBinarizer, MinMaxScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import pickle
 
@@ -20,8 +20,12 @@ y = lb.fit_transform(y)
 # print("X shape:", X.shape)
 # print("X sample:", X[0])  # Print a sample row of X
 
+# Min-Max scaling for input features
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
 # Split dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
 # Model Parameters
 input_size = X.shape[1]  # Number of features
@@ -78,7 +82,8 @@ model_data = {
     'input_weights': input_weights,
     'hidden_bias': hidden_bias,
     'output_weights': output_weights,
-    'threshold': threshold
+    'threshold': threshold,
+    'scaler': scaler 
 }
 
 with open('trained_model.pkl', 'wb') as file:

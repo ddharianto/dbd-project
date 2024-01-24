@@ -20,6 +20,7 @@ input_weights = model_data['input_weights']
 hidden_bias = model_data['hidden_bias']
 output_weights = model_data['output_weights']
 threshold = model_data['threshold']
+scaler = model_data['scaler']
 
 with open('encoder.pkl', 'rb') as file:
     encoder = pickle.load(file)
@@ -92,24 +93,25 @@ def main():
         # # Drop the original 'Keluhan Utama' column as it's no longer needed
         df.drop(columns=['Keluhan Utama'], inplace=True)
 
+        df_scaled = scaler.transform(df)
+
         # print(df)
         # print(df.dtypes)
         # print(df.info())
 
         # Make predictions using the loaded model
-        hidden_layer_output = np.dot(df.values, input_weights) + hidden_bias
+        hidden_layer_output = np.dot(df_scaled.values, input_weights) + hidden_bias
         hidden_layer_output = np.maximum(hidden_layer_output, 0)
         predictions = np.dot(hidden_layer_output, output_weights)
         predicted_classes = (predictions >= threshold).astype(int)
 
         print("Predicted classes:", predicted_classes[0])
-
         output = int(predicted_classes[0])
-        if output == 1:
-            st.error('Anda memiliki gejala Positif DBD')
-        else:
-            st.success('Anda memiliki gejala Negatif DBD')
 
+        if output == 1:
+            st.warning('Positif DBD')
+        else:
+            st.success('Negatif DBD')
 
 if __name__=='__main__': 
     main()

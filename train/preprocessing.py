@@ -137,3 +137,4 @@ with open('encoder.pkl', 'wb') as file:
     pickle.dump(encoder, file)
 
 df_final.to_csv('./dataset/df_final.csv', index=0) # menyimpan dataset ke csv
+df_final.to_excel('./dataset/df_final.xlsx', index=0) # menyimpan dataset ke Excel
