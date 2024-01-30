@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelBinarizer, MinMaxScaler
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc, precision_recall_curve
+import matplotlib.pyplot as plt
 import pickle
 
 # Load dataset
@@ -30,19 +31,22 @@ X_test_scaled = scaler.transform(X_test)
 
 # Model Parameters
 input_size = X.shape[1]  # Number of features
-hidden_size = 100  # Number of neurons in the hidden layer
+hidden_size = 2000  # Number of neurons in the hidden layer
 output_size = y_train.shape[1]  # For binary classification (0 and 1)
+
+print(hidden_size)
 
 # Generate random weights and biases for input layer to hidden layer
 input_weights = np.random.normal(size=(input_size, hidden_size))
 hidden_bias = np.random.normal(size=(hidden_size,))
 
-# print("input_weights shape:", input_weights.shape)
-# print("input_weights sample:", input_weights[0])  # Print a sample row of input_weights
+# # Calculate hidden layer output using ReLU activation function
+# hidden_layer_output = np.dot(X_train_scaled, input_weights) + hidden_bias
+# hidden_layer_output = np.maximum(hidden_layer_output, 0)
 
-# Calculate hidden layer output using ReLU activation function
+# Calculate hidden layer output using Sigmoid activation function
 hidden_layer_output = np.dot(X_train_scaled, input_weights) + hidden_bias
-hidden_layer_output = np.maximum(hidden_layer_output, 0)
+hidden_layer_output = 1 / (1 + np.exp(-hidden_layer_output))  # Sigmoid activation
 
 # Calculate output weights
 output_weights = np.dot(np.linalg.pinv(hidden_layer_output), y_train)
@@ -53,7 +57,7 @@ test_hidden_layer_output = np.maximum(test_hidden_layer_output, 0)
 predictions = np.dot(test_hidden_layer_output, output_weights)
 
 # Convert predictions to classes using a threshold (e.g., 0.5)
-threshold = 0.5
+threshold = 0.8
 predicted_classes = (predictions >= threshold).astype(int)
 true_classes = y_test
 
@@ -66,7 +70,21 @@ f1 = f1_score(true_classes, predicted_classes, average='binary')
 print("Accuracy:", accuracy)
 print("Precision:", precision)
 print("Recall:", recall)
-print("F1 Score:", f1)
+print("F-1 Score:", f1)
+
+# # Compute ROC curve and AUC
+# fpr, tpr, thresholds_roc = roc_curve(true_classes, predictions)
+# roc_auc = auc(fpr, tpr)
+
+# # Plot ROC curve
+# plt.figure(figsize=(8, 8))
+# plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = {:.2f})'.format(roc_auc))
+# plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+# plt.xlabel('False Positive Rate')
+# plt.ylabel('True Positive Rate')
+# plt.title('Receiver Operating Characteristic (ROC) Curve')
+# plt.legend(loc='lower right')
+# plt.show()
 
 # Create a DataFrame with predictions, true labels, and input features for display
 predictions_df = pd.DataFrame({
@@ -77,7 +95,7 @@ predictions_df = pd.DataFrame({
 result_df = pd.concat([predictions_df], axis=1)
 
 # Display the DataFrame with prediction results
-print(result_df)
+# print(result_df)
 
 model_data = {
     'input_weights': input_weights,
@@ -89,19 +107,3 @@ model_data = {
 
 with open('trained_model.pkl', 'wb') as file:
     pickle.dump(model_data, file)
-
-# # Load the saved model
-# with open('trained_model.pkl', 'rb') as file:
-#     model_data = pickle.load(file)
-
-# # Load your new data for prediction
-# # Replace this with your new data
-# new_data = np.array([[...], [...]])  # Your new data goes here
-
-# # Make predictions using the loaded model
-# hidden_layer_output = np.dot(new_data, input_weights) + hidden_bias
-# hidden_layer_output = np.maximum(hidden_layer_output, 0)
-# predictions = np.dot(hidden_layer_output, output_weights)
-# predicted_classes = (predictions >= threshold).astype(int)
-
-# print("Predicted classes:", predicted_classes)

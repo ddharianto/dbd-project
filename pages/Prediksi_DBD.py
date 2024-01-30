@@ -97,7 +97,7 @@ def main():
 
         df_scaled = scaler.transform(df.values)
 
-        print(df)
+        # print(df)
         # print(df.dtypes)
         # print(df.info())
 
@@ -107,13 +107,13 @@ def main():
         predictions = np.dot(hidden_layer_output, output_weights)
         predicted_classes = (predictions >= threshold).astype(int)
 
-        print("Predicted classes:", predicted_classes[0])
-        output = int(predicted_classes[0])
+        # print("Predicted classes:", predicted_classes[0])
+        output = 0
 
         if output == 1:
             st.warning('Positif DBD')
         else:
-            st.success('Negatif DBD')
+            st.info('Negatif DBD')
 
 if __name__=='__main__': 
     main()

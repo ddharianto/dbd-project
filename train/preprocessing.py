@@ -95,6 +95,7 @@ df_final = pd.concat([df_textual, df_numeric], axis=1, join="inner") # menggabun
 # Term Frequency–Inverse Document Frequency (TF-IDF)
 le_KU = tf_idf.fit_transform(df_final['Keluhan Utama'])
 print(tf_idf.get_feature_names_out())
+
 le_KU = le_KU.toarray()
 print(le_KU)
 df_final['Keluhan Utama'] = le_KU.tolist()
@@ -119,14 +120,6 @@ df_final.drop(columns=['Keluhan Utama'], inplace=True)
 
 print(df_final)
 print(df_final.dtypes)
-
-# # Bag of Words (BoW)
-# X1 = bow.fit_transform(df_final['Keluhan Utama'])
-# X1 = X1.toarray()
-
-# # Term Frequency–Inverse Document Frequency (TF-IDF)
-# X2 = tf_idf.fit_transform(df_final['Keluhan Utama'])
-# X2 = X2.toarray()
 
 # Save TF-IDF encoder
 encoder = {
