@@ -58,7 +58,6 @@ def main():
     f_hematrokit = st.number_input("Hematokrit", min_value=10.0, max_value=80.0, value=40.0)
     f_trombosit = st.number_input("Trombosit", min_value=10000, max_value=450000, value=150000)
     
-    
     if st.button("Predict"): 
         features = [f_keluhan_utama, f_mual, f_muntah, f_perutsakit, f_pusing, f_batuk, f_pilek, 
                     f_tidak_nafsu_makan, f_mencret, f_pl_gds, f_pl_widal, f_imunisasi, f_kesadaran, f_diagnosa, 
@@ -97,8 +96,8 @@ def main():
 
         df_scaled = scaler.transform(df.values)
 
-        # print(df)
-        # print(df.dtypes)
+        print(df)
+        print(threshold)
         # print(df.info())
 
         # Make predictions using the loaded model
@@ -107,13 +106,15 @@ def main():
         predictions = np.dot(hidden_layer_output, output_weights)
         predicted_classes = (predictions >= threshold).astype(int)
 
-        # print("Predicted classes:", predicted_classes[0])
-        output = 0
+        print(predictions[0], predicted_classes[0])
+        output = predicted_classes[0]
 
         if output == 1:
-            st.warning('Positif DBD')
+            st.error('Positif DBD')
         else:
-            st.info('Negatif DBD')
+            st.warning('Negatif DBD')
+
+        st.info("""Keterangan: Nilai hasil prediksi adalah {}""".format(predictions[0]))
 
 if __name__=='__main__': 
     main()

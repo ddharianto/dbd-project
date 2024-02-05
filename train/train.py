@@ -3,13 +3,21 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelBinarizer, MinMaxScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc, precision_recall_curve
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import pickle
 
 # Load dataset
 df_dbd = pd.read_csv('./dataset/df_final.csv')
 
-# print(df_dbd.info())
+# print(df_dbd)
+
+# Identify the indices to be removed
+positive_indices_to_remove = df_dbd[df_dbd['Diagnosis DBD'] == 1].index[-3:]
+negative_indices_to_remove = df_dbd[df_dbd['Diagnosis DBD'] == 0].index[-2:]
+
+# Remove the specified samples
+df_dbd = df_dbd.drop(positive_indices_to_remove)
+df_dbd = df_dbd.drop(negative_indices_to_remove)
 
 y = df_dbd[['Diagnosis DBD']].values
 X = df_dbd.drop(['Diagnosis DBD'], axis=1).values
@@ -95,7 +103,7 @@ predictions_df = pd.DataFrame({
 result_df = pd.concat([predictions_df], axis=1)
 
 # Display the DataFrame with prediction results
-# print(result_df)
+print(result_df)
 
 model_data = {
     'input_weights': input_weights,
