@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import streamlit as st 
-from sklearn import preprocessing
+from scipy.special import expit
 import pickle
 import nltk
 from nltk.corpus import stopwords
@@ -47,7 +47,13 @@ def main():
     f_mencret = st.checkbox("Mencret")
     f_imunisasi = st.selectbox("Imunisasi", ["Lengkap","Tidak Lengkap","Tidak Diimunisasi"])
     f_kesadaran = st.selectbox("Kesadaran", ['Compos Mentis', 'Delirium', 'Apatis'])
-    f_diagnosa = st.selectbox("Diagnosa DBD", ['Positif', 'Negatif'])
+    st.header("Diagnosa Sementara")
+    st.markdown("""
+    <div style="background:#eb9c34">
+    <p style="color:white;text-align:center;">Diagnosa sementara merupakan diagnosa dari pihak medis berdasarkan dari gejala-gejala yang dialami sebelum dilakukan pemeriksaan laboratorium.</p>
+    </div>
+    """, unsafe_allow_html = True)
+    f_diagnosa = st.selectbox("Diagnosa DBD", ['Susp Positif DBD', 'Susp Negatif DBD'])
     st.header("Pemeriksaan Laboratorium")
     f_pl_gds = st.checkbox("GDS")
     f_pl_widal = st.checkbox("WIDAL")
@@ -71,6 +77,7 @@ def main():
         df = df.replace({'Compos Mentis': 1, 'Delirium': 2, 'Apatis': 0})
         df = df.replace({'Lengkap': 0, 'Tidak Lengkap': 1, 'Tidak Diimunisasi': 2})
         df = df.replace({'Positif': 1, 'Negatif': 0})
+        df = df.replace({'Susp Positif DBD': 1, 'Susp Negatif DBD': 0})
         df['Keluhan Utama'] = df['Keluhan Utama'].astype(str).str.lower() # mengubah menjadi lowercase
         df['Keluhan Utama'] = df['Keluhan Utama'].replace('[^a-zA-Z0-9\s]+', ' ', regex=True) # menghilangkan simbol-simbol dan angka
         df['Keluhan Utama'] = df['Keluhan Utama'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stop)])) # menghilangkan stop words
@@ -109,12 +116,27 @@ def main():
         print(predictions[0], predicted_classes[0])
         output = predicted_classes[0]
 
-        if output == 1:
-            st.error('Positif DBD')
-        else:
-            st.warning('Negatif DBD')
+        # Apply the sigmoid function to convert scores to probabilities
+        predicted_probability = expit(predictions[0])
 
-        st.info("""Keterangan: Nilai hasil prediksi adalah {}""".format(predictions[0]))
+        # Convert the predicted probability to a percentage
+        confidence_level = predicted_probability * 100
+
+        # Round the confidence level to two decimal places
+        confidence_level = round(confidence_level[0], 2)
+
+        print("Predicted Probability:", predicted_probability)
+        print("Confidence Level (%):", confidence_level)
+
+        if output == 1:
+            st.error('Terduga Positif DBD*')
+        else:
+            st.warning('Terduga Negatif DBD*')
+
+        st.info("""Nilai keyakinan hasil prediksi adalah {}%""".format(confidence_level))
+        st.info(""" Keterangan: Hasil dari prediksi aplikasi ini hanya untuk membantu pasien untuk 
+                memprediksi kemungkinan Positif dan Negatif DBD. Tetap kunjungi dokter terkait untuk 
+                mendapat diagnosis yang pasti.""")
 
 if __name__=='__main__': 
     main()

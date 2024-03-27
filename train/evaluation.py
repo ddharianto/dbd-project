@@ -53,7 +53,7 @@ for hidden_size in hidden_sizes:
     predictions_relu = np.dot(test_hidden_layer_output_relu, output_weights_relu)
 
     # Convert predictions to classes using a threshold (e.g., 0.5)
-    threshold = 0.5
+    threshold = 0.8
     predicted_classes_relu = (predictions_relu >= threshold).astype(int)
 
     # Calculate accuracy and store it
@@ -78,45 +78,45 @@ for hidden_size in hidden_sizes:
     accuracy_sigmoid.append(accuracy_score(y_test, predicted_classes_sigmoid))
 
 df_accuracy = pd.DataFrame({
-    'Hidden Size': hidden_sizes,
+    'Hidden Unit': hidden_sizes,
     'ReLU': accuracy_relu,
     'Sigmoid': accuracy_sigmoid
 })
 result_df = pd.concat([df_accuracy], axis=1)
-print("Hidden layer: ", len(hidden_sizes))
+print("Hidden Unit: ", len(hidden_sizes))
 print(result_df)
 
 # Plotting the results
 plt.plot(hidden_sizes, accuracy_relu, marker='o', label='ReLU Activation')
 plt.plot(hidden_sizes, accuracy_sigmoid, marker='o', label='Sigmoid Activation')
-plt.xlabel('Hidden Layer Size')
+plt.xlabel('Hidden Unit Size')
 plt.ylabel('Accuracy')
 plt.legend()
 plt.show()
 
-# Sample data
-accuracy = 0.9
-precision = 0.94
-recall = 0.94
-f1score = 0.94
+# # Sample data
+# accuracy = 0.9
+# precision = 0.94
+# recall = 0.94
+# f1score = 0.94
 
-# Bar chart
-fig, ax = plt.subplots()
+# # Bar chart
+# fig, ax = plt.subplots()
 
-bar_width = 0.35
-bar_positions = [1, 2, 3, 4]
+# bar_width = 0.35
+# bar_positions = [1, 2, 3, 4]
 
-bars = ax.bar(bar_positions, [accuracy, precision, recall, f1score], bar_width, color=['blue', 'orange', 'green', 'red'])
+# bars = ax.bar(bar_positions, [accuracy, precision, recall, f1score], bar_width, color=['blue', 'orange', 'green', 'red'])
 
-ax.set_title('ELM model with 2000 Hidden Layer and Sigmoid Activation Function')
-ax.set_xticks(bar_positions)
-ax.set_xticklabels(['Accuracy', 'Precision', 'Recall', 'F-1 Score'])
+# ax.set_title('ELM model with 2000 Hidden Unit and Sigmoid Activation Function')
+# ax.set_xticks(bar_positions)
+# ax.set_xticklabels(['Accuracy', 'Precision', 'Recall', 'F-1 Score'])
 
-# Display the values on top of the bars
-for bar in bars:
-    yval = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), ha='center', va='bottom')
+# # Display the values on top of the bars
+# for bar in bars:
+#     yval = bar.get_height()
+#     plt.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), ha='center', va='bottom')
 
-plt.show()
+# plt.show()
 
 
